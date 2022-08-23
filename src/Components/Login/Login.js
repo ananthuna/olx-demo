@@ -70,7 +70,7 @@ function Login() {
           <br />
           <button>Login</button>
         </form>
-        <a href='/signup'>Signup</a>
+        <a href='/signup' onClick={()=>setOpen(!open)}>Signup</a>
       </div>
       <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
         <CircularProgress color="inherit" />
