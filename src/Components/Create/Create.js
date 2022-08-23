@@ -2,6 +2,19 @@ import React, { Fragment,useState,useContext } from 'react';
 import './Create.css';
 import Header from '../Header/Header';
 import {FirebaseContext,AuthContext} from '../../store/Context'
+import {useHistory} from 'react-router-dom'
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
+}));
+
+
 
 const Create = () => {
   const [name,setName] = useState('')
@@ -10,10 +23,36 @@ const Create = () => {
   const [image, setImage] = useState(null)
   const {firebase} = useContext(FirebaseContext)
   const {user} = useContext(AuthContext)
+  const date = new Date()
+  const history = useHistory()
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+  
+  
 
-  const handleSubmit=()=>{
-
+  const handleSubmit=(e)=>{
+    e.preventDefault()
+    setOpen(!open);
+            firebase.storage().ref(`/image/${image.name}`).put(image).then(({ref})=>{
+              ref.getDownloadURL().then((url)=>{
+                firebase.firestore().collection('products').add({
+                  name,
+                  category,
+                  price,
+                  url,
+                  userId:user.uid,
+                  createdAt:date.toDateString()
+                })
+                history.push('/')
+              })
+            })
   }
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  
 
   return (
     <Fragment>
@@ -39,7 +78,7 @@ const Create = () => {
               className="input"
               type="text"
               id="fname"
-              name="category"
+              name="Category"
               value={category}
               onChange={(e)=>setCategory(e.target.value)}
               placeholder="Category"
@@ -66,10 +105,13 @@ const Create = () => {
             }}
             type="file" />
             <br />
-            <button onChange={handleSubmit} className="uploadBtn">upload and Submit</button>
+            <button onClick={handleSubmit} className="uploadBtn">upload and Submit</button>
           </form>
         </div>
       </card>
+      <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Fragment>
   );
 };
