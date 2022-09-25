@@ -20,7 +20,7 @@ export default function Signup() {
   const {firebase} =useContext(FirebaseContext)
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
-  const {register,handleSubmit,formState:{errors}} = useForm()
+  const {register,handleSubmit,formState:{errors}} = useForm({mode:"onChange"})
 
   const onSubmit = (data) => {
     console.log(data);
@@ -57,7 +57,7 @@ export default function Signup() {
             id="fname"
             name="name"
             placeholder='username'
-            {...register("username",{required:true,maxLength:10})}
+            {...register("name",{required:true,maxLength:10})}
           />
           {errors.username && <p className='errortag'>*Please check the username</p>}
           <br />
